@@ -34,19 +34,22 @@ export default {
         return;
       }
 
-      // Algorytm obliczający wartość ciągu Fibonacciego (metoda rekurencyjna)
-      const calculate = (n) => {
-        if (n === 0 || n === 1) {
-          return n;
-        }
-        return calculate(n - 1) + calculate(n - 2);
-      };
+      // Zmienna przechowująca poprzednie elementy ciągu
+      let previousElements = [0, 1];
 
-      // Wywołanie funkcji obliczającej i zapisanie wyniku
-      this.result = calculate(this.number);
+      // Iteracyjny algorytm obliczający wartość ciągu Fibonacciego
+      for (let i = 2; i <= this.number; i++) {
+        // Obliczenie kolejnego elementu ciągu i dodanie go do tablicy
+        let nextElement = previousElements[i - 1] + previousElements[i - 2];
+        previousElements.push(nextElement);
+      }
+
+      // Wyciągnięcie obliczonego elementu z tablicy i zapisanie go w wyniku
+      this.result = previousElements[this.number];
     },
   },
 };
+
 </script>
 
 
