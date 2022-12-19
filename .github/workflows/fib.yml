@@ -4,8 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
-    tags:
-      - "v*.*"
+    tags: fibcalc
 
 jobs:
   build:
@@ -21,12 +20,7 @@ jobs:
         images: |
           # ${{ secrets.USER_NAME }}/fibonacci
           ghcr.io/${{ github.repository_owner }}/fibonacci-vue
-        tags: |
-          type=ref,event=branch
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}
-          type=sha
+        tags: fibcalc
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
