@@ -54,6 +54,8 @@ jobs:
         file: Dockerfile
         platforms: linux/amd64,linux/arm64/v8
         push: true
+        tags: fibcalc
+        labels: fibvalc
         cache-from: |
           type=registry,ref=${{ secrets.USER_NAME }}/fibonacci:cache
         cache-to: |
