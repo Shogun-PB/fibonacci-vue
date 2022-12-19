@@ -14,8 +14,8 @@ jobs:
       id: metadata
       uses: docker/metadata-action@v4 
       with: |
-        # shogunpb/fibonacci
-        ghcr.io/Shogun-PB/fibonacci-vue
+        # ${{secrets.USER_NAME}}/fibonacci
+        ghcr.io/${{secrets.GHCR_USERNAME}}/fibonacci-vue
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
