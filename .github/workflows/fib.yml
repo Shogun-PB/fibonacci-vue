@@ -6,27 +6,26 @@ jobs:
   build:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
-    - name: Build Docker image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        dockerfile: Dockerfile
-        buildkit: true
-        platform:
-          - linux/amd64
-          - linux/arm64/v8
-        tags: fibcalc
-        push: true
-        cache-from:
-          - type: registry
-            server: https://index.docker.io/v1/
-        auth:
-          username: ${{ secrets.USER_NAME }}
-          password: ${{ secrets.ACCES_TOKEN }}
-    - name: Push Docker image to ghcr.io
-      uses: docker/push-action@v2
-      with:
-        registry: ghcr.io
-        repository: Shogun-PB/fibonacci-vue
-        tag: fibcalc
+      - uses: actions/checkout@v2
+      - name: Build Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          dockerfile: Dockerfile
+          buildkit: true
+          platform: linux/amd64,linux/arm64/v8,linux/arm/v7
+          tags: fibcalc-${{ github.event.head_commit.id }}-$(date +%Y%m%d%H%M%S)
+          push: true
+          registry: docker.io
+          cache-from:
+            - type: registry
+              address: docker.io
+              repository: <user>/<repository>
+              image: fibcalc
+              tag: latest
+      - name: Push image to GitHub Packages
+        uses: docker/push-action@v2
+        with:
+          name: ghcr.io/Shogun-PB/fibonacci-vue/fibcalc-${{ github.event.head_commit.id }}-$(date +%Y%m%d%H%M%S)
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
