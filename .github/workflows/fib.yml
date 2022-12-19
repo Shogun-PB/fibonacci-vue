@@ -1,19 +1,22 @@
 name: Build fibonacci image
 
-on: push
+on:
+  push:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up buildkit
-        run: |
-          echo "experimental=enabled" | sudo tee -a /etc/docker/daemon.json
-          sudo service docker restart
-      - name: Build image
-        run: |
-          docker build -t fibonacci --build-arg BUILDKIT_INLINE_CACHE=1 -f Dockerfile .
+      - uses: actions/checkout@v3
+       - name: Set up Docker Buildkit
+      uses: docker/setup-buildkit-action@v1
+    - name: Build and push image
+      env:
+        DOCKER_BUILDKIT: 1
+        DOCKER_CLI_EXPERIMENTAL: enabled
+      run: |
+        docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,darwin/amd64 -t ghcr.io/<Shogun-PB>/fibcalc:$(date +%s) --push .
       - name: Publish to GitHub Packages
         uses: docker/publish-action@v1
         with:
