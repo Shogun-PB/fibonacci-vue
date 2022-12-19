@@ -9,7 +9,8 @@ jobs:
     name: Build and push Docker Image
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - name: Check out the repo 
+      uses: actions/checkout@v3
     - name: MetaData 
       id: metadata
       uses: docker/metadata-action@v4 
@@ -19,6 +20,14 @@ jobs:
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
+
+    - name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-multi-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-multi-buildx
 
     - name: Set up Docker Buildx
       uses: docker/buildx-action@v2
