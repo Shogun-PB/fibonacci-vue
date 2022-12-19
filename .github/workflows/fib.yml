@@ -1,4 +1,4 @@
-name: Build fibonacci image
+name: Build and push Docker Image
 
 on:
   push:
@@ -6,46 +6,51 @@ on:
 
 jobs:
   build:
+    name: Build and push Docker Image
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v3
+    - name: MetaData 
+      id: metadata
+      uses: docker/metadata-action@v4 
+      with: |
+        # shogunpb/fibonacci
+        ghcr.io/Shogun-PB/fibonacci-vue
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
 
-      - name: Buildx set-up
-        uses: docker/setup-buildx-action@v2
+    - name: Set up Docker Buildx
+      uses: docker/buildx-action@v2
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.USER_NAME }}
-          password: ${{ secrets.ACCES_TOKEN }}
-      - name: Set up Docker Buildkit
-      uses: docker/setup-buildkit-action@v1
-      - name: Build and push image
-      env:
-        DOCKER_BUILDKIT: 1
-        DOCKER_CLI_EXPERIMENTAL: enabled
-      run: |
-        docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,darwin/amd64 -t ghcr.io/<Shogun-PB>/fibcalc:$(date +%s) --push .
-      - name: Publish to GitHub Packages
-        uses: docker/publish-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_TOKEN }}
-          repository: Shogun-PB/fibonacci
-          image_name: fibonacci
-          image_tag: latest
-      - name: Publish to DockerHub
-        uses: docker/build-push-action@v2
-        with:
-          username: ${{ secrets.USER_NAME }}
-          password: ${{ secrets.ACCES_TOKEN }}
-          repository: shogunpb/fibonacci
-          build_args: |
-            --build-arg BUILDKIT_INLINE_CACHE=1
-          tags: |
-            latest
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{secrets.GHCR_USERNAME}} 
+        password: ${{secrets.GHCR_TOKEN}}
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{secrets.USER_NAME}} 
+        password: ${{secrets.ACCES_TOKEN}}
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        file: Dockerfile
+        platforms: linux/amd64, linux/arm64/v8
+        push: true
+        cache-from: |
+          type=registry,ref=${{secrets.USER_NAME}}/fibonacci:cache
+        cache-to: |
+          type=registry,ref=${{secrets.USER_NAME}}/fibonacci:cache
+         
+    
+
+
+
+  
